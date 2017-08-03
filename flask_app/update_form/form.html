@@ -18,7 +18,7 @@
             </div>
             <div class="five wide field">
                 <label for="">release date</label>
-                <input type="text" name="release_date" required>
+                <input placeholder="YYYY-MM-dd" type="text" name="release_date" required>
             </div>
             <div class="six wide field">
                 <label for="">poster link</label>
@@ -101,12 +101,14 @@
             </select>
         </div>
         <input type="submit" class="button ui" />
-        
+        <div class="ui error message"></div>
     </form>
     <button style="margin-top : 10px" class="reset ui primary button">Reset</button>
-    <div class="results">
+    <button style="margin-top : 10px" class="validate ui secondary button">Validate field</button>
+    <div class="ui blue segment raised results">
 
     </div>
+
 </div>
 
 
@@ -118,31 +120,82 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.11/semantic.min.js"></script>        
 <script>
     $('.ui.dropdown').dropdown()
-    $("#form").submit(function(e){
-        e.preventDefault()
-        $.ajax({
-            type: "POST",
-            url:"http://localhost:5000/movie",
-            contentType: "application/json",
-            crossDomain: true,
-            data: JSON.stringify($("#form").serializeArray())
-        }).done(function(){
-            $(".results").html("movie added successfully")
-            
-        })
-        .fail(function(xhr, status, errorThrown){
-            $(".results").html("There was an error. See console for more info")
-            console.log( "Error: " + errorThrown );
-            console.log( "Status: " + status );
-            console.dir( xhr );
 
-        })
+        $(".ui.form").form({
+        fields:{
+            metascore: {
+                identifier : "metascore",
+                rules: [
+                    {
+                        type: "integer[0..100]",
+                        prompt: "Metascore should be between 0 and 100" 
+                    }
+                ]
+
+            },
+
+            indico_sentiment: {
+                identifier : "indico_sentiment",
+                rules: [
+                    {
+                        type: "decimal",
+                        prompt: "indico sentiment should be between 0 and 1"
+                    }
+                ]
+            },
+
+            release_date: {
+                identifier : "release_date",
+                rules: [
+                    {
+                        type: "regExp[/^\\d\\d\\d\\d-\\d\\d-\\d\\d$/]",
+                        prompt: "Please input release date in the format YYYY-MM-dd"
+                    }
+                ]
+            }
+                
+        }
     })
+
+        $("#form").submit(function(e){
+        e.preventDefault()
+        if ($("#form").form("is valid")){
+            $.ajax({
+                type: "POST",
+                url:"http://localhost:5000/movie",
+                contentType: "application/json",
+                crossDomain: true,
+                data: JSON.stringify($("#form").serializeArray())
+            }).done(function(){
+                $(".results").html("movie added successfully")
+
+            })
+            .fail(function(xhr, status, errorThrown){
+                $(".results").html("There was an error. See console for more info")
+                console.log( "Error: " + errorThrown );
+                console.log( "Status: " + status );
+                console.dir( xhr );
+            })
+        }
+    })
+    
+
+
+    $(".validate").click(function(){
+        $("#form").form("validate form")
+        console.log($("#form").form("is valid"))
+        
+    })
+
+
     $(".reset").click(function(){
 
         $("#form").trigger("reset")
         $(".results").html("form fields cleared!!")
     })
+
+    
+
 </script>
 </body>
 </html>
