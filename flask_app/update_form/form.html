@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.11/semantic.min.css">
+    <title>movies update form</title>
+</head>
+<body>
+    
+<div class="ui container">
+    <form class="update-form ui form" id="form">
+        <div class="fields">
+            <div class="five wide field">
+                <label for="">movie title</label>
+                <input type="text" name="movie_title" required>
+            </div>
+            <div class="five wide field">
+                <label for="">release date</label>
+                <input type="text" name="release_date" required>
+            </div>
+            <div class="six wide field">
+                <label for="">poster link</label>
+                <input type="text" name="poster_link" required>
+            </div>
+        </div>
+        
+        <div class="fields">
+            <div class="four wide field">
+                <label for="">imdb id</label>
+                <input type="text" name="imdb_id" required>  
+            </div>
+            <div class="four wide field">
+                <label for="">tmdb id</label>
+                <input type="text" name="tmdb_id" required>  
+            </div>
+            <div class="four wide field">
+                <label for="">metascore</label>
+                <input type="text" name="metascore" required>
+            </div>
+            <div class="four wide field">
+                <label for="">sentiment score</label>
+                <input placeholder="4 decimal place" type="text" name="indico_sentiment" required>
+            </div>
+        </div>
+    
+        
+        <div class="fields">
+            <div class="five wide field">
+                <label for="">director 1</label>
+                <input type="text" name="director_1" required>
+            </div>
+            <div class="five wide field">
+                <label for="">tmdb_id</label>
+                <input type="text" name="director1_tmdb_id" required>
+            </div>
+            <div class="five wide field">
+                <label for="">imdb_id</label>
+                <input type="text" name="director1_imdb_id" >
+            </div>
+            
+        </div>
+        <div class="fields">
+            <div class="five wide field">
+                <label for="">director 2</label>
+                <input type="text" name="director_2">
+            </div>
+            <div class="five wide field">
+                <label for="">tmdb_id</label>
+                <input type="text" name="director2_tmdb_id">
+            </div>
+            <div class="five wide field">
+                <label for="">imdb_id</label>
+                <input type="text" name="director2_imdb_id" >
+            </div>
+        </div>
+
+        <div class="field six wide">
+            <label >Genres</label>
+            <select multiple name="genres" class="ui dropdown">
+                <option value="12">Adventure</option>
+                <option value="14">Fantasy</option>
+                <option value="16">Animation</option>
+                <option value="18">Drama</option>
+                <option value="27">Horror</option>
+                <option value="28">Action</option>
+                <option value="35">Comedy</option>
+                <option value="36">History</option>
+                <option value="37">Western</option>
+                <option value="53">Thriller</option>
+                <option value="80">Crime</option>
+                <option value="99">Documentary</option>
+                <option value="878">Science Fiction</option>
+                <option value="9648">Mystery</option>
+                <option value="10402">Music</option>
+                <option value="10749">Romance</option>
+                <option value="10751">Family</option>
+                <option value="10752">War</option>
+                <option value="10770">TV Movie</option>
+            </select>
+        </div>
+        <input type="submit" class="button ui" />
+        
+    </form>
+    <button style="margin-top : 10px" class="reset ui primary button">Reset</button>
+    <div class="results">
+
+    </div>
+</div>
+
+
+
+<script
+  src="http://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.11/semantic.min.js"></script>        
+<script>
+    $('.ui.dropdown').dropdown()
+    $("#form").submit(function(e){
+        e.preventDefault()
+        $.ajax({
+            type: "POST",
+            url:"http://localhost:5000/movie",
+            contentType: "application/json",
+            crossDomain: true,
+            data: JSON.stringify($("#form").serializeArray())
+        }).done(function(){
+            $(".results").html("movie added successfully")
+            
+        })
+        .fail(function(xhr, status, errorThrown){
+            $(".results").html("There was an error. See console for more info")
+            console.log( "Error: " + errorThrown );
+            console.log( "Status: " + status );
+            console.dir( xhr );
+
+        })
+    })
+    $(".reset").click(function(){
+
+        $("#form").trigger("reset")
+        $(".results").html("form fields cleared!!")
+    })
+</script>
+</body>
+</html>
