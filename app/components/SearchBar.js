@@ -2,6 +2,7 @@ var React = require('react')
 var Input = require("semantic-ui-react").Input
 var Button = require("semantic-ui-react").Button
 var Icon = require("semantic-ui-react").Icon
+var Segment = require("semantic-ui-react").Segment
 var Filter = require("./Filter")
 var SortMovies = require("./SortMovies")
 
@@ -96,12 +97,15 @@ class SearchBar extends React.Component {
     render(){
         return(
             <div>
+                <Segment  className="search-container">
                 <form className="search-form" onSubmit={this.handleSubmit}>
-                <Input fluid={true}
-                       placeholder="Search"
-                       action={{icon:"search", disabled :!this.state.searchContent}}
-                       value={this.state.searchContent}
-                       onChange= {this.handleChange}/>
+                
+                <Input  fluid={true}
+                        placeholder="Search movie titles or directors"
+                        action={{icon:"search", disabled :!this.state.searchContent}}
+                        value={this.state.searchContent}
+                        onChange= {this.handleChange}/>
+                
                 <Filter updateSearchResult = {this.props.updateSearchResult}
                         movies = {this.props.movies}
                         handleFilterChange = {this.handleFilterChange}
@@ -112,6 +116,7 @@ class SearchBar extends React.Component {
                         releaseYearEnd= {this.state.releaseYearEnd}
                         />
                 </form>
+                </Segment>
                 <SortMovies updateMovieListOrder = {this.updateMovieListOrder}
                             sortByRelease = {this.props.sortByRelease} 
                             sortBySentiment = {this.props.sortBySentiment} 

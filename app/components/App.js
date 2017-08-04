@@ -2,6 +2,7 @@ var React = require('react')
 var getMovies = require("../utils/api")
 var Movies = require("./Movie")
 var SearchBar = require("./SearchBar")
+var Intro = require("./Intro")
 var SortMovies = require("./SortMovies")
 var Loader = require("semantic-ui-react").Loader
 var Icon = require("semantic-ui-react").Icon
@@ -244,6 +245,7 @@ class App extends React.Component {
     render() {
         return(
             <div>
+                <Intro />
                 <SearchBar movies = {this.state.processedMovieList}
                            updateSearchResult = {this.updateSearchResult}
                            searchMovieList = {this.searchMovieList}

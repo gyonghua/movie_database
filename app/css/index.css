@@ -26,6 +26,20 @@ html h1, html h2, html h3 {
     
 }
 
+div.ui.segment.introduction {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.ui.blue.center.title {
+    margin-top: 10px;
+}
+
+.about > p {
+    font-size: 1.1rem;
+    max-width: 75%;
+
+}
 .ui.items>.item.movie {
     background: #fff;
     box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
@@ -33,6 +47,9 @@ html h1, html h2, html h3 {
     padding: 1em 1em;
     border-radius: .28571429rem;
     border: 1px solid rgba(34,36,38,.15);
+}
+.ui.segment.search-container {
+    background-color:#E7F1FD;
 }
 
 .filters {
