@@ -1,71 +1,78 @@
-import sqlite3
-from flask import jsonify, request, make_response
-from movie import app
-from flask_restful import Resource, Api
-from flask_restful.utils import cors
+@app.route("/movielist2", methods=["GET"])
 
+def get_movie_list():
+    with sqlite3.connect("movies.db") as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT 
+                    tmdb_id, movie_title, release_date, poster_link, imdb_id, metascore, indico_sentiment
+                    FROM
+                    movies
+                    """)
+        results = cur.fetchall()
+        response = []
+        for movie in results:
+            content = {
+                "movie_title" : movie[1],
+                "release_date" : movie[2],
+                "poster_link" : movie[3],
+                "imdb_id" : movie[4],
+                "metascore" : movie[5],
+                "indico_sentiment" : movie[6] 
+            }
 
-api = Api(app)
-
-class Movies(Resource):
-    @cors.crossdomain(origin='*')
-    def get(self):
-        with sqlite3.connect("movies.db") as conn:
-            cur = conn.cursor()
+            #get genres of movies and add to movie info
+            movie_id = movie[0]
             cur.execute("""
                         SELECT 
-                        tmdb_id, movie_title, release_date, poster_link, imdb_id, metascore, indico_sentiment
-                        FROM
-                        movies
-                        """)
-            results = cur.fetchall()
-            response = []
-            for movie in results:
-                content = {
-                    "movie_title" : movie[1],
-                    "release_date" : movie[2],
-                    "poster_link" : movie[3],
-                    "imdb_id" : movie[4],
-                    "metascore" : movie[5],
-                    "indico_sentiment" : movie[6] 
-                }
+                        genres.genre_name
+                        FROM 
+                        movies2genres INNER JOIN genres
+                        ON
+                        movies2genres.genre_id = genres.genre_id
+                        WHERE
+                        movies2genres.tmdb_id = ? 
+                        """, (movie_id,))
+            genres = cur.fetchall()
+            content["genres"] = [x[0] for x in genres]
 
-                #get genres of movies and add to movie info
-                movie_id = movie[0]
-                cur.execute("""
-                            SELECT 
-                            genres.genre_name
-                            FROM 
-                            movies2genres INNER JOIN genres
-                            ON
-                            movies2genres.genre_id = genres.genre_id
-                            WHERE
-                            movies2genres.tmdb_id = ? 
-                            """, (movie_id,))
-                genres = cur.fetchall()
-                content["genres"] = [x[0] for x in genres]
+            #get directors of movie and add to movie info
+            cur.execute("""
+                        SELECT 
+                        crews.name
+                        FROM 
+                        movies2crews INNER JOIN crews
+                        ON
+                        movies2crews.tmdb_crew_id = crews.tmdb_id
+                        WHERE
+                        movies2crews.tmdb_movie_id = ? 
+                        """, (movie_id,))
+            directors = cur.fetchall()
+            content["directors"] = [x[0] for x in directors]
 
-                #get directors of movie and add to movie info
-                cur.execute("""
-                            SELECT 
-                            crews.name
-                            FROM 
-                            movies2crews INNER JOIN crews
-                            ON
-                            movies2crews.tmdb_crew_id = crews.tmdb_id
-                            WHERE
-                            movies2crews.tmdb_movie_id = ? 
-                            """, (movie_id,))
-                directors = cur.fetchall()
-                content["directors"] = [x[0] for x in directors]
+            response.append(content)
+    
+    if True:
+        
 
-                response.append(content)
+        resp = make_response(jsonify(response), 200)
+        resp.headers = {
+            "Access-Control-Allow-Origin" : "*"
+        }
+        return resp 
 
-            return jsonify(response)
+@app.route("/movie2", methods=["POST", "OPTIONS"])
+def insert_movie():
+    if request.method =="OPTIONS":
+        resp = make_response(jsonify({"access" : "ok"}), 200)
+        resp.headers = {
+                "Access-Control-Allow-Origin" : "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+        }
+        return resp
 
-class UpdateMovies(Resource):
-    @cors.crossdomain(origin='*')
-    def post(self):
+    if request.method == "POST":
         try:
             movie_details = {}
             genres = []
@@ -75,10 +82,6 @@ class UpdateMovies(Resource):
 
                 else:
                     movie_details[item["name"]] = item["value"]
-            
-            if movie_details["password"] != app.config["PASSWORD"]:
-                return jsonify({"message" : "unauthorised access"}), 401
-            
             
             movie_details["genres"] = genres
 
@@ -95,7 +98,7 @@ class UpdateMovies(Resource):
             with sqlite3.connect("movies.db") as conn:
                 cur = conn.cursor()
                 cur.execute("""
-                            INSERT OR IGNORE INTO movies
+                            INSERT INTO movies
                             (movie_title, release_date, poster_link, imdb_id, tmdb_id, metascore, indico_sentiment)
                             VALUES
                             (?,DATE(?),?,?,?,?,?)
@@ -145,20 +148,23 @@ class UpdateMovies(Resource):
                             (?,?,?)
                             """, content_for_insertion_to_movies2crews)
 
-            
-            
-            return "movie added", 201
+            resp = make_response("received", 201)
+            resp.headers = {
+                    "Access-Control-Allow-Origin" : "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type"
+            }
+            return resp
 
         except sqlite3.Error as e:
             response = [{
                 "error" : "server encountered an error"
             }]
             
-            return jsonify(response)
-
-    @cors.crossdomain(origin='*', headers="Content-Type", methods="POST, OPTIONS")
-    def options(self):
-        return ok
-    
-api.add_resource(Movies, '/movielist')
-api.add_resource(UpdateMovies, '/movie')
+            resp = make_response(jsonify(response), 500)
+            resp.headers = {
+                    "Access-Control-Allow-Origin" : "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type"
+            }
+            return resp
