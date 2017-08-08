@@ -118,7 +118,7 @@ class App extends React.Component {
             
             
     }}
-    // TODO matchGenres, match metascore, feedback results return
+    // TODO match metascore
 
 
     searchMovieList(movieList, searchTerms) {
