@@ -1,6 +1,6 @@
 var axios = require("axios")
 
-var movieLink = "http://www.pandaspeculator/movielist"
+var movieLink = "http://www.pandaspeculator.com/movielist"
 
 function getMovies() {
     return axios.get(movieLink).then(function(movies){

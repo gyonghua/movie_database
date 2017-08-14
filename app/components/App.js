@@ -7,6 +7,9 @@ var SortMovies = require("./SortMovies")
 var Loader = require("semantic-ui-react").Loader
 var Icon = require("semantic-ui-react").Icon
 var Button = require("semantic-ui-react").Button
+var Dimmer = require("semantic-ui-react").Dimmer
+
+
 
 
 function smoothscroll() {
@@ -260,7 +263,7 @@ class App extends React.Component {
                            dimPage = {this.dimPage}         
                            />
                 
-                {!this.state.searchResults ? <Loader active content="Loading" /> : <Movies movies = {this.state.processedMovieList}
+                {!this.state.searchResults ? <Dimmer active><Loader active content="Loading" /></Dimmer> : <Movies movies = {this.state.processedMovieList}
                         searchResults = {this.state.searchResults}
                         showMovie = {this.state.showMovie}
                         dim = {this.state.dim} />}
