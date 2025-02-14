@@ -1,5 +1,5 @@
 # About
-A project to showcase skills acquired after web development self study from May - Aug 2017.  
+A project to showcase skills acquired after web development self study in 2017.  
   
 This is a movie database app containing all /r/movies official discussions with sentiment score of comments.  
   
